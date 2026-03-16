@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowthCurb Pricing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0f172a;--teal:#14b8a6;--slate:#64748b;--white:#f8fafc}
+    *{box-sizing:border-box} body{margin:0;background:var(--white);color:var(--navy);font-family:Inter,sans-serif}
+    .wrap{max-width:1120px;margin:auto;padding:0 20px} h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+    header{padding:72px 0;background:linear-gradient(130deg,#0f172a,#1e293b);color:#f8fafc}
+    .sub{color:#cbd5e1;max-width:760px}
+    section{padding:48px 0}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 8px 20px rgba(15,23,42,.06)}
+    .card.active{border:2px solid var(--teal)}
+    .pill{display:inline-block;background:#ccfbf1;color:#0f766e;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .addon{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eef2f7}
+    .calc{position:sticky;top:20px}
+    .total{font-size:28px;font-weight:800}
+    label{cursor:pointer}
+    .btn{display:inline-block;background:var(--teal);color:#033533;padding:12px 16px;border-radius:10px;text-decoration:none;font-weight:700}
+    .muted{color:var(--slate)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <span class="pill">Flexible Pricing</span>
+      <h1>Choose Your GrowthCurb Website Package</h1>
+      <p class="sub">Start with a base package, then add exactly what you need. Transparent pricing. No fluff. Instant estimate while you build your plan.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;">
+      <div>
+        <h2>1) Base Package</h2>
+        <div class="grid" id="baseGrid">
+          <article class="card active" data-base="199" data-name="Launch Lite">
+            <h3>Launch Lite</h3>
+            <p class="muted">Perfect for businesses with no existing site.</p>
+            <p><strong>$199/mo</strong></p>
+            <p class="muted">5-page site, mobile-first, contact form, basic local SEO</p>
+          </article>
+          <article class="card" data-base="349" data-name="Growth Pro">
+            <h3>Growth Pro</h3>
+            <p class="muted">For businesses ready to convert more leads.</p>
+            <p><strong>$349/mo</strong></p>
+            <p class="muted">Everything in Lite + review system, advanced CTA flow, analytics</p>
+          </article>
+          <article class="card" data-base="599" data-name="Elite Operator">
+            <h3>Elite Operator</h3>
+            <p class="muted">For serious local growth and ongoing optimization.</p>
+            <p><strong>$599/mo</strong></p>
+            <p class="muted">Everything in Pro + CRO testing, monthly growth updates, priority support</p>
+          </article>
+        </div>
+
+        <h2 style="margin-top:28px;">2) Add-ons</h2>
+        <div class="card" id="addons">
+          <div class="addon"><label><input type="checkbox" data-price="79" data-name="Google Business Profile Optimization"> Google Business Profile Optimization</label><strong>$79/mo</strong></div>
+          <div class="addon"><label><input type="checkbox" data-price="99" data-name="Review Generation Automation"> Review Generation Automation</label><strong>$99/mo</strong></div>
+          <div class="addon"><label><input type="checkbox" data-price="149" data-name="Monthly SEO Content Pack"> Monthly SEO Content Pack</label><strong>$149/mo</strong></div>
+          <div class="addon"><label><input type="checkbox" data-price="129" data-name="Booking/Calendar Integration"> Booking/Calendar Integration</label><strong>$129/mo</strong></div>
+          <div class="addon"><label><input type="checkbox" data-price="199" data-name="Lead Follow-up Automation"> Lead Follow-up Automation</label><strong>$199/mo</strong></div>
+          <div class="addon"><label><input type="checkbox" data-price="249" data-name="Conversion Rate Optimization Sprint"> Conversion Rate Optimization Sprint</label><strong>$249/mo</strong></div>
+        </div>
+      </div>
+
+      <aside class="card calc" id="summary">
+        <h3>Your Price Estimate</h3>
+        <p class="muted" id="baseName">Launch Lite</p>
+        <div id="lineItems" class="muted"></div>
+        <hr style="border:0;border-top:1px solid #e2e8f0;margin:14px 0;">
+        <div class="row"><span>Total Monthly</span><span class="total" id="total">$199</span></div>
+        <p class="muted">One-time setup fee may apply based on migration complexity.</p>
+        <a class="btn" href="mailto:hello@growthcurb.com?subject=GrowthCurb%20Pricing%20Estimate">Request Final Proposal</a>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const baseCards = document.querySelectorAll('#baseGrid .card');
+    const checks = document.querySelectorAll('#addons input[type="checkbox"]');
+    const totalEl = document.getElementById('total');
+    const baseNameEl = document.getElementById('baseName');
+    const lineItemsEl = document.getElementById('lineItems');
+
+    let basePrice = 199;
+    let baseName = 'Launch Lite';
+
+    function render(){
+      let addTotal = 0;
+      let items = [];
+      checks.forEach(c => {
+        if(c.checked){
+          const p = Number(c.dataset.price || 0);
+          addTotal += p;
+          items.push(`<div class="row"><span>${c.dataset.name}</span><span>$${p}</span></div>`);
+        }
+      });
+      const total = basePrice + addTotal;
+      baseNameEl.textContent = `${baseName} ($${basePrice}/mo)`;
+      lineItemsEl.innerHTML = items.length ? items.join('') : '<p>No add-ons selected.</p>';
+      totalEl.textContent = `$${total}`;
+    }
+
+    baseCards.forEach(card => {
+      card.addEventListener('click', () => {
+        baseCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        basePrice = Number(card.dataset.base || 0);
+        baseName = card.dataset.name || 'Package';
+        render();
+      });
+    });
+
+    checks.forEach(c => c.addEventListener('change', render));
+    render();
+  </script>
+</body>
+</html>
